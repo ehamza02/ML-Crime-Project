@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 file_path = "full_data.csv"
 
@@ -29,7 +30,7 @@ renamed = {
     97: 'Number on street',
     110: 'Police per Population',
     145: 'Violent Crime per population',
-    146: 'Nonvioldent crime per population'
+    146: 'Nonviolent crime per population'
 }
 
 df = pd.read_csv(file_path)
@@ -37,3 +38,12 @@ df_selected = df.iloc[:, filtered]
 df_selected.columns = renamed.values()
 
 print(df_selected.head())
+
+for col in df_selected:
+    unique, counts = np.unique(df_selected[col].values, return_counts=True)
+    num_missing = dict(zip(unique, counts)).get("?")
+
+    if num_missing == None:
+        num_missing = 0
+
+    print("Column name: {0}, Missing: {1}".format(col, num_missing / len(df_selected[col].values)))
