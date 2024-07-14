@@ -1,10 +1,10 @@
 import pandas as pd
 
-file_path = "C:\\Users\\erfan\\Downloads\\full_data.csv"
+file_path = "full_data.csv"
 
-#these are the variables we want
+# These are the variables we want
 filtered = [0, 1, 5, 7, 8, 9, 10, 11, 12, 13, 14, 17, 25, 33, 34, 35, 36, 37, 38, 96, 97, 110, 145, 146]
-#trying to rename them
+
 renamed = {
     0: 'City',
     1: 'State',
@@ -33,11 +33,7 @@ renamed = {
 }
 
 df = pd.read_csv(file_path)
-
-
 df_selected = df.iloc[:, filtered] 
-
-# Rename columns, need to fix todo
-df_selected.columns = [renamed[col] for col in df_selected.columns]
+df_selected.columns = renamed.values()
 
 print(df_selected.head())
