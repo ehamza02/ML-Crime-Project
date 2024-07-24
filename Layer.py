@@ -36,9 +36,11 @@ class Hidden(Layer):
         z = np.dot(self.weights, self.prev_layer.data) + self.biases 
 
         if self.activation == "ReLU":
-            return Activation.relu(z)
+            self.data = Activation.relu(z)
         else:
-            return z
+            self.data = z 
+
+        return self.data
 
 
 class Output(Layer):
@@ -56,6 +58,8 @@ class Output(Layer):
         z = np.dot(self.weights, self.prev_layer.data) + self.biases 
 
         if self.activation == "ReLU":
-            return Activation.relu(z) 
+            self.data = Activation.relu(z)
         else:
-            return z
+            self.data = z 
+
+        return self.data
