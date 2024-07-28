@@ -33,6 +33,19 @@ class Hidden(Layer):
             return Activation.relu(z)
         else:
             return z
+        
+    def backprop(self):
+        y_hat = np.dot(self.weights, self.prevLayer.data) + self.biases #already calculated in feedforward
+        rate = 0.001 #default value
+        y = 0 #need expected output
+        mse = 0.5 * (y_hat - y) ** 2
+        deriv_yhat_loss = y_hat - y #gradient of mse with respect to y_hat
+        deriv_yhat_w = np.outer(deriv_yhat_loss, self.prevLayer.data) #inputs(grad of y_hat with respect to w) * grad of mse respect to y_hat
+        deriv_yhat_b = deriv_yhat_loss #1(grad of y_hat with respect to b) * grad of mse with respect to y_hat
+
+        self.weights -= rate * deriv_yhat_w #w = w - rate * grad of loss with respect to w
+        self.biases -= rate * deriv_yhat_b  #b = b- rate * grad of loss with respect to b
+
 
 
 class Output(Layer):
