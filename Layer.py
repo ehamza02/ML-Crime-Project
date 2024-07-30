@@ -3,6 +3,11 @@ import numpy as np
 class Activation:
     def relu(x):
         return np.maximum(0, x)
+    
+
+    def deriv_relu(x):
+        data = [1 if value > 0 else 0 for value in x]
+        return np.array(data, dtype=float)
 
 
 class Layer:
@@ -33,23 +38,21 @@ class Hidden(Layer):
 
     
     def feed_forward(self):
-        z = np.dot(self.weights, self.prev_layer.data) + self.biases 
+        self.z = np.dot(self.weights, self.prev_layer.data) + self.biases 
 
         if self.activation == "ReLU":
-            self.data = Activation.relu(z)
+            self.data = Activation.relu(self.z)
         else:
-            return z
-    def backprop(self):
-        y_hat = np.dot(self.weights, self.prevLayer.data) + self.biases #already calculated in feedforward
-        rate = 0.001 #default value
-        y = 0 #need expected output
-        mse = 0.5 * (y_hat - y) ** 2
-        deriv_yhat_loss = y_hat - y #gradient of mse with respect to y_hat
-        deriv_yhat_w = np.outer(deriv_yhat_loss, self.prevLayer.data) #inputs(grad of y_hat with respect to w) * grad of mse respect to y_hat
-        deriv_yhat_b = deriv_yhat_loss #1(grad of y_hat with respect to b) * grad of mse with respect to y_hat
+            return self.z
+        
 
-        self.weights -= rate * deriv_yhat_w #w = w - rate * grad of loss with respect to w
-        self.biases -= rate * deriv_yhat_b  #b = b- rate * grad of loss with respect to b
+    def backprop(self):
+        if self.activation == "ReLU":
+            self.delta = np.matmul(np.transpose(self.next_layer.weights), self.next_layer.delta) * Activation.deriv_relu(self.z)
+            deriv_w = np.matmul(self.delta, np.transpose(self.prevLayer.data)) #inputs(grad of y_hat with respect to w) * grad of mse respect to y_hat
+            deriv_b = self.delta #1(grad of y_hat with respect to b) * grad of mse with respect to y_hat
+
+            return deriv_w, deriv_b
 
 
 class Output(Layer):
@@ -72,3 +75,13 @@ class Output(Layer):
             self.data = z 
 
         return self.data
+    
+
+    def backprop(self, y):
+        y_hat = self.data
+        deriv_yhat_loss = (y_hat - y) / self.data_dim #gradient of mse with respect to y_hat
+        deriv_w = np.matmul(deriv_yhat_loss, np.transpose(self.prevLayer.data)) #inputs(grad of y_hat with respect to w) * grad of mse respect to y_hat
+        deriv_b = deriv_yhat_loss #1(grad of y_hat with respect to b) * grad of mse with respect to y_hat
+        self.delta = deriv_yhat_loss
+
+        return deriv_w, deriv_b
