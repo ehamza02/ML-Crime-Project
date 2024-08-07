@@ -4,7 +4,7 @@ import numpy as np
 # Test Feedfoward
 
 def test_feed_forward():
-    input = Layer.Input(3, np.array([[1], [2], [3]]))
+    input = Layer.Input(3)
     hidden = Layer.Hidden(2, "ReLU")
     output = Layer.Output(1, "None")
 
@@ -19,6 +19,7 @@ def test_feed_forward():
     print(output.weights)
     print(output.biases)
 
+    input.feed_forward(np.array([[1], [2], [3]]))
     hidden.feed_forward()
     print(output.feed_forward())
 
@@ -47,4 +48,9 @@ def test_backprop():
     print(hidden1.backprop())
 
 
-test_backprop()
+def test_train():
+    NN = Layer.NeuralNetwork("ReLU", 1, [1, 4, 1], [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]], [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]])
+    NN.train()
+    NN.test()
+
+test_train()

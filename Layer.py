@@ -87,7 +87,7 @@ class Output(Layer):
 
 
     def feed_forward(self):
-        z = np.dot(self.weights, self.prev_layer.data) + self.biases 
+        z = np.dot(self.weights, self.prev_layer.data) + self.biases
 
         if self.activation == "ReLU":
             self.data = Activation.relu(z)
@@ -106,8 +106,8 @@ class Output(Layer):
 
         return deriv_w, deriv_b
     
+
 class NeuralNetwork:
-    import Layer
     def  __init__(self, activation, hidden: int, layer_dimensions: list, x, y):
         if hidden + 2 != len(layer_dimensions):
             print("invalid length")
@@ -118,23 +118,23 @@ class NeuralNetwork:
             self.x = x
             self.y = y
             self.neural_network = []
-            input = Layer.Input(layer_dimensions[0])
-            output = Layer.Output(layer_dimensions[-1], "None")
+            input = Input(layer_dimensions[0])
+            output = Output(layer_dimensions[-1], "None")
             self.neural_network.append(input)
 
-            for i in range(1, len(layer_dimensions) - 2):
-                hidden = Layer.Hidden(layer_dimensions[i], activation)
+            for i in range(1, len(layer_dimensions) - 1):
+                hidden = Hidden(layer_dimensions[i], activation)
                 self.neural_network.append(hidden)
             self.neural_network.append(output)
 
             self.neural_network[0].set_prev_next_layer(None, self.neural_network[1])
             
-            for i in range(1, len(self.neural_network) - 2):
+            for i in range(1, len(self.neural_network) - 1):
                 self.neural_network[i].set_prev_next_layer(self.neural_network[i - 1], self.neural_network[i + 1])
 
             self.neural_network[-1].set_prev_next_layer(self.neural_network[-2], None)
 
-            for i in range(1, len(self.neural_network) - 1):
+            for i in range(1, len(self.neural_network)):
                 self.neural_network[i].initialize()
             self.x_train = self.x[:int(.8 * len(x))]
             self.y_train = self.y[:int(.8 * len(y))]
@@ -142,41 +142,45 @@ class NeuralNetwork:
             self.y_test = self.y[-int(.2 * len(y)):]
 
 
-
-
     def feed_forward(self, data):
-        for i in range(1, len(self.neural_network) - 2):
+        self.neural_network[0].feed_forward(data)
+        for i in range(1, len(self.neural_network) - 1):
             self.neural_network[i].feed_forward()
 
         return self.neural_network[-1].feed_forward()
     
-    def train(self, learn_rate = 0.001, max_iter = 5000):
+
+    def train(self, learn_rate = 0.001, max_iter = 1000):
         for i in range(1, max_iter):
-            for j in range(1, len(self.neural_network) - 1):
+            for j in range(1, len(self.neural_network)):
                 self.neural_network[j].init_gradient()
-            for k in range(0, len(self.x_train) - 1):
-                y_hat = self.feed_forward(self.x_train[k])
+            for k in range(0, len(self.x_train)):
+                y_hat = self.feed_forward(np.transpose(np.atleast_2d(self.x_train[k])))
                 y = self.y_train[k]
                 call_backprop = self.neural_network[-1].backprop(y)
                 self.neural_network[-1].weights_gradient -= call_backprop[0]
-                self.neural_network[-1].bias_gradient -= call_backprop[1]
+                self.neural_network[-1].biases_gradient -= call_backprop[1]
 
-                for m in range(len(self.neural_network) - 2, 1):
+                for m in range(len(self.neural_network) - 1, 1):
                     call_backprop = self.neural_network[m].backprop(y)
                     self.neural_network[m].weights_gradient -= call_backprop[0]
-                    self.neural_network[m].bias_gradient -= call_backprop[1]
-            for n in range(1, len(self.neural_network) - 1):
+                    self.neural_network[m].biases_gradient -= call_backprop[1]
+            for n in range(1, len(self.neural_network)):
                 self.neural_network[n].weights -= learn_rate * self.neural_network[n].weights_gradient
-                self.neural_network[n].bias -= learn_rate * self.neural_network[n].bias_gradient
+                self.neural_network[n].biases -= learn_rate * self.neural_network[n].biases_gradient
         
+
     def test(self):
         loss = 0
 
-        for i in range(0, len(self.x_test) - 1):
-            y_hat = self.feed_forward(self.x_test[i])
+        for i in range(0, len(self.x_test)):
+            y_hat = self.feed_forward(np.transpose(np.atleast_2d(self.x_test[i])))
+            print(y_hat)
             y = self.y_test[i]
+            print(y)
             loss += (y_hat - y)**2
-        mse = loss/(2 * len(self.x_test))
+
+        mse = loss / (2 * len(self.x_test))
         return mse
     
 
