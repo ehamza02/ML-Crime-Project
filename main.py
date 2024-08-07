@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import Layer 
 
 # Loading data
 file_path = "full_data.csv"
@@ -57,7 +58,10 @@ df_selected = df_selected.drop('Police_per_Population', axis=1)
 df_selected = df_selected.query("Violent_Crime_per_Population != '?' and Nonviolent_Crime_per_Population != '?'")
 
 print(df_selected.shape)
+
 # 1902 x 23
 # Input layer: 19 x 1
 # Output layer: 2 x 1 or 1 x 1
 # Number of total examples = 1902 (80/20 train/test split) 
+
+NN = Layer.NeuralNetwork("ReLU", 1, [19, 22, 1], df_selected.iloc[:, 2:21].to_numpy, df_selected.iloc[:, 21:22].to_numpy)
