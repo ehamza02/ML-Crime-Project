@@ -49,8 +49,9 @@ def test_backprop():
 
 
 def test_train():
-    NN = Layer.NeuralNetwork("ReLU", 1, [1, 4, 1], [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]], [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]])
-    NN.train()
-    NN.test()
+    NN = Layer.NeuralNetwork("ReLU", 0, [1, 1], [[10], [9]], [[10], [9]])
+    NN.train(learn_rate=0.01, max_iter=1000)
+    print(NN.test())
+    print(NN.feed_forward([[3]]))
 
 test_train()
