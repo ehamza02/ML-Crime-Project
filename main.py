@@ -21,16 +21,16 @@ renamed = {
     12: 'Population_pct:12-29',
     13: 'Population_pct:16-24',
     14: 'Population_pct:65+',
-    17: 'Median_Income',
-    25: 'Per_Capita_Income',
+    17: 'Median_Income', # rescale 
+    25: 'Per_Capita_Income', # rescale 
     33: 'Pct_Under_Poverty_Line',
     34: 'Pct_Under_9th_Grade',
     35: 'Pct_No_Highschool',
     36: 'Pct_Higher_Education',
     37: 'Pct_Unemployed',
     38: 'Pct_Employed',
-    96: 'Num_in_Shelters',
-    97: 'Num_on_Street',
+    96: 'Num_in_Shelters', # standardize/normalize
+    97: 'Num_on_Street', # standardize/normalize
     110: 'Police_per_Population',
     145: 'Violent_Crime_per_Population',
     146: 'Nonviolent_Crime_per_Population'
@@ -76,7 +76,13 @@ df_selected = df_selected.apply(pd.to_numeric, errors='ignore')
 
 # NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
 
-NN = Layer.NeuralNetwork("ReLU", 1, [19, 22, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
+# NN = Layer.NeuralNetwork("ReLU", 1, [19, 22, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
 
-NN.train(learn_rate=0.001, max_iter=100)
+# NN = Layer.NeuralNetwork("ReLU", 0, [19, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
+
+# First example
+NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], df_selected.iloc[:, 2:21].head(10).to_numpy(), df_selected.iloc[:, 21:22].head(10).to_numpy())
+
+
+NN.train(learn_rate=0.001, max_iter=10000)
 print(NN.test())

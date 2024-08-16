@@ -72,6 +72,12 @@ class Hidden(Layer):
             deriv_b = self.delta #1(grad of y_hat with respect to b) * grad of mse with respect to y_hat
 
             return deriv_w, deriv_b
+        else:
+            self.delta = np.matmul(np.transpose(self.next_layer.weights), self.next_layer.delta)
+            deriv_w = np.matmul(self.delta, np.transpose(self.prev_layer.data)) #inputs(grad of y_hat with respect to w) * grad of mse respect to y_hat
+            deriv_b = self.delta #1(grad of y_hat with respect to b) * grad of mse with respect to y_hat
+
+            return deriv_w, deriv_b
         
 
 
@@ -142,14 +148,14 @@ class NeuralNetwork:
             for i in range(1, len(self.neural_network)):
                 self.neural_network[i].initialize()
 
-            self.x_train = self.x[:int(.8 * len(x))]
-            self.y_train = self.y[:int(.8 * len(y))]
-            self.x_test = self.x[-int(.2 * len(x)):]
-            self.y_test = self.y[-int(.2 * len(y)):]
-            # self.x_train = x
-            # self.y_train = y
-            # self.x_test = x
-            # self.y_test = y
+            # self.x_train = self.x[:int(.8 * len(x))]
+            # self.y_train = self.y[:int(.8 * len(y))]
+            # self.x_test = self.x[-int(.2 * len(x)):]
+            # self.y_test = self.y[-int(.2 * len(y)):]
+            self.x_train = x
+            self.y_train = y
+            self.x_test = x
+            self.y_test = y
 
 
     def feed_forward(self, data):
