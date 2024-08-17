@@ -50,8 +50,8 @@ class Hidden(Layer):
 
 
     def initialize(self):
-        self.weights = np.random.uniform(-0.1, 0.1, (self.data_dim, self.prev_layer.data_dim))
-        self.biases = np.random.uniform(-0.1, 0.1, (self.data_dim, 1))
+        self.weights = np.random.normal(0, (2 / self.data_dim) ** 0.5, (self.data_dim, self.prev_layer.data_dim))
+        self.biases = np.zeros((self.data_dim, 1))
 
     
     def feed_forward(self):
@@ -92,8 +92,8 @@ class Output(Layer):
 
      
     def initialize(self):
-        self.weights = np.random.uniform(-0.1, 0.1, (self.data_dim, self.prev_layer.data_dim))
-        self.biases = np.random.uniform(-0.1, 0.1, (self.data_dim, 1))
+        self.weights = np.random.normal(0, (2 / self.data_dim) ** 0.5, (self.data_dim, self.prev_layer.data_dim))
+        self.biases = np.zeros((self.data_dim, 1))
 
 
     def feed_forward(self):

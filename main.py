@@ -74,15 +74,15 @@ df_selected = df_selected.apply(pd.to_numeric, errors='ignore')
 # print(df_selected.iloc[:, 2:21].to_numpy())
 # print(df_selected.iloc[:, 21:22].to_numpy())
 
-# NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
+NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
 
 # NN = Layer.NeuralNetwork("ReLU", 1, [19, 22, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
 
 # NN = Layer.NeuralNetwork("ReLU", 0, [19, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
 
 # First example
-NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], df_selected.iloc[:, 2:21].head(10).to_numpy(), df_selected.iloc[:, 21:22].head(10).to_numpy())
+# NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], df_selected.iloc[:, 2:21].head(1).to_numpy(), df_selected.iloc[:, 21:22].head(1).to_numpy())
 
 
-NN.train(learn_rate=0.001, max_iter=10000)
+NN.train(learn_rate=0.001, max_iter=200)
 print(NN.test())
