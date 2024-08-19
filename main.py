@@ -39,16 +39,18 @@ renamed = {
 df = pd.read_csv(file_path)
 df_selected = df.iloc[:, filtered] 
 
-df_selected['Median_Income'] = df_selected['Median_Income'] / 100
-df_selected['Per_Capita_Income'] = df_selected['Per_Capita_Income'] / 100
 
-df_selected['Num_in_Shelters'] = (df_selected['Num_in_Shelters'] - df_selected['Num_in_Shelters'].mean()) / df_selected['Num_in_Shelters'].std()
-df_selected['Num_on_Street'] = (df_selected['Num_on_Street'] - df_selected['Num_on_Street'].mean()) / df_selected['Num_on_Street'].std()
 
 
 
 # Data preprocessing
 df_selected.columns = renamed.values()
+
+df_selected['Median_Income'] = df_selected['Median_Income'] / 100
+df_selected['Per_Capita_Income'] = df_selected['Per_Capita_Income'] / 100
+
+df_selected['Num_in_Shelters'] = (df_selected['Num_in_Shelters'] - df_selected['Num_in_Shelters'].mean()) / df_selected['Num_in_Shelters'].std()
+df_selected['Num_on_Street'] = (df_selected['Num_on_Street'] - df_selected['Num_on_Street'].mean()) / df_selected['Num_on_Street'].std()
 
 # print(df_selected.head())
 
