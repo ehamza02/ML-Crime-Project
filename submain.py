@@ -66,3 +66,27 @@ df_selected[min_max_cols] = min_max_scaler.fit_transform(df_selected[min_max_col
 
 df_selected[standard_cols] = standard_scaler.fit_transform(df_selected[standard_cols])
 
+remaining = ['Population', 'Race_Black', 'Race_White', 'Race_Asian', 'Race_Hispanic',
+                  'Population_pct_12_21', 'Population_pct_12_29', 'Population_pct_16_24',
+                  'Population_pct_65_up', 'Pct_Under_Poverty_Line', 'Pct_Under_9th_Grade',
+                  'Pct_No_Highschool', 'Pct_Higher_Education', 'Pct_Unemployed',
+                  'Pct_Employed', 'Police_per_Population']
+
+df_selected[remaining] = min_max_scaler.fit_transform(df_selected[remaining])
+
+targets = ['Violent_Crime_per_Population', 'Nonviolent_Crime_per_Population']
+features = [col for col in df_selected.columns if col not in targets + ['City', 'State']]
+
+X = df_selected[features]
+y = df_selected[targets]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = Sequential()
+model.add(Dense(32, input_dim=X_train.shape[1], activation='relu'))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(2, activation='relu'))
+
+
+
+
