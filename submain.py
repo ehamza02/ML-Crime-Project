@@ -45,10 +45,6 @@ df_selected = df.iloc[:, filtered]
 
 df_selected.columns = renamed.values()
 
-# Initialize scalers
-min_max_scaler = MinMaxScaler()
-standard_scaler = StandardScaler()
-
 # Searching for missing data
 for col in df_selected:
     unique, counts = np.unique(df_selected[col].values, return_counts=True)
@@ -57,20 +53,33 @@ for col in df_selected:
     if num_missing == None:
         num_missing = 0
 
-# using minmax and standard scaler, but we can change back to what we did earlier
-min_max_cols = ['Median_Income', 'Per_Capita_Income']
+    # print("Column name: {0}, Missing: {1}".format(col, num_missing / len(df_selected[col].values)))
 
+# Dropping missing data
+df_selected = df_selected.drop('Police_per_Population', axis=1)
+df_selected = df_selected.query("Violent_Crime_per_Population != '?' and Nonviolent_Crime_per_Population != '?'")
+
+print(df_selected.head())
+
+# Convert all columns to numeric values
+df_selected = df_selected.apply(pd.to_numeric, errors='ignore')
+
+# Initialize scalers
+min_max_scaler = MinMaxScaler()
+standard_scaler = StandardScaler()
+
+# using minmax and standard scaler
+min_max_cols = ['Median_Income', 'Per_Capita_Income']
 standard_cols = ['Num_in_Shelters', 'Num_on_Street']
 
 df_selected[min_max_cols] = min_max_scaler.fit_transform(df_selected[min_max_cols])
-
 df_selected[standard_cols] = standard_scaler.fit_transform(df_selected[standard_cols])
 
-remaining = ['Population', 'Race_Black', 'Race_White', 'Race_Asian', 'Race_Hispanic',
-                  'Population_pct_12_21', 'Population_pct_12_29', 'Population_pct_16_24',
-                  'Population_pct_65_up', 'Pct_Under_Poverty_Line', 'Pct_Under_9th_Grade',
-                  'Pct_No_Highschool', 'Pct_Higher_Education', 'Pct_Unemployed',
-                  'Pct_Employed', 'Police_per_Population']
+remaining = ['Population', 'Race:Black', 'Race:White', 'Race:Asian', 'Race:Hispanic',
+             'Population_pct:12-21', 'Population_pct:12-29', 'Population_pct:16-24',
+             'Population_pct:65+', 'Pct_Under_Poverty_Line', 'Pct_Under_9th_Grade',
+             'Pct_No_Highschool', 'Pct_Higher_Education', 'Pct_Unemployed',
+             'Pct_Employed']
 
 df_selected[remaining] = min_max_scaler.fit_transform(df_selected[remaining])
 
@@ -85,8 +94,23 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = Sequential()
 model.add(Dense(32, input_dim=X_train.shape[1], activation='relu'))
 model.add(Dense(16, activation='relu'))
-model.add(Dense(2, activation='relu'))
+model.add(Dense(2))  # No activation function for regression
 
+model.compile(optimizer=Adam(learning_rate=0.001), loss='mse', metrics=['mae'])
 
+# Training
+history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
 
+loss, mae = model.evaluate(X_test, y_test)
+print(f'Test Loss: {loss}')
+print(f'Test MAE: {mae}')
 
+# Plot training & validation loss values
+plt.figure(figsize=(12, 6))
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title('Model Loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend()
+plt.show()
