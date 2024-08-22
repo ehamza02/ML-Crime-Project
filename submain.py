@@ -3,8 +3,10 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Dropout, LeakyReLU, BatchNormalization
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import Huber
+from tensorflow.keras.regularizers import l2
 import matplotlib.pyplot as plt
 
 # Loading data
@@ -45,21 +47,9 @@ df_selected = df.iloc[:, filtered]
 
 df_selected.columns = renamed.values()
 
-# Searching for missing data
-for col in df_selected:
-    unique, counts = np.unique(df_selected[col].values, return_counts=True)
-    num_missing = dict(zip(unique, counts)).get("?")
-
-    if num_missing == None:
-        num_missing = 0
-
-    # print("Column name: {0}, Missing: {1}".format(col, num_missing / len(df_selected[col].values)))
-
 # Dropping missing data
 df_selected = df_selected.drop('Police_per_Population', axis=1)
 df_selected = df_selected.query("Violent_Crime_per_Population != '?' and Nonviolent_Crime_per_Population != '?'")
-
-print(df_selected.head())
 
 # Convert all columns to numeric values
 df_selected = df_selected.apply(pd.to_numeric, errors='ignore')
@@ -83,8 +73,7 @@ remaining = ['Population', 'Race:Black', 'Race:White', 'Race:Asian', 'Race:Hispa
 
 df_selected[remaining] = min_max_scaler.fit_transform(df_selected[remaining])
 
-# targets = ['Violent_Crime_per_Population', 'Nonviolent_Crime_per_Population']
-targets = ['Nonviolent_Crime_per_Population']
+targets = ['Violent_Crime_per_Population', 'Nonviolent_Crime_per_Population']
 features = [col for col in df_selected.columns if col not in targets + ['City', 'State']]
 
 X = df_selected[features]
@@ -92,26 +81,30 @@ y = df_selected[targets]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Model Architecture
 model = Sequential()
-model.add(Dense(32, input_dim=X_train.shape[1], activation='relu'))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(1))  # No activation function for regression
+model.add(Dense(16, input_dim=X_train.shape[1], activation='relu'))
+model.add(Dense(8, activation='relu'))
+model.add(Dense(2))
 
-model.compile(optimizer=Adam(learning_rate=0.001), loss='mse', metrics=['mae'])
+# Compile the model
+model.compile(optimizer=Adam(learning_rate=0.01), loss=Huber(), metrics=['mae'])
 
 # Training
-# history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
-history = model.fit(X_train, y_train, epochs=100)
+history = model.fit(X_train, y_train, epochs=400, batch_size=32, validation_data=(X_test, y_test))
 
-loss, mae = model.evaluate(X_test, y_test)
 print(model.predict(X_test))
+
+
+# Predictions and Evaluation
+loss, mae = model.evaluate(X_test, y_test)
 print(f'Test Loss: {loss}')
 print(f'Test MAE: {mae}')
 
 # Plot training & validation loss values
 plt.figure(figsize=(12, 6))
 plt.plot(history.history['loss'], label='Train Loss')
-# plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
 plt.title('Model Loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
