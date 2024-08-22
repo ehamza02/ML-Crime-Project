@@ -83,7 +83,8 @@ remaining = ['Population', 'Race:Black', 'Race:White', 'Race:Asian', 'Race:Hispa
 
 df_selected[remaining] = min_max_scaler.fit_transform(df_selected[remaining])
 
-targets = ['Violent_Crime_per_Population', 'Nonviolent_Crime_per_Population']
+# targets = ['Violent_Crime_per_Population', 'Nonviolent_Crime_per_Population']
+targets = ['Nonviolent_Crime_per_Population']
 features = [col for col in df_selected.columns if col not in targets + ['City', 'State']]
 
 X = df_selected[features]
@@ -94,21 +95,23 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = Sequential()
 model.add(Dense(32, input_dim=X_train.shape[1], activation='relu'))
 model.add(Dense(16, activation='relu'))
-model.add(Dense(2))  # No activation function for regression
+model.add(Dense(1))  # No activation function for regression
 
 model.compile(optimizer=Adam(learning_rate=0.001), loss='mse', metrics=['mae'])
 
 # Training
-history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
+# history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=100)
 
 loss, mae = model.evaluate(X_test, y_test)
+print(model.predict(X_test))
 print(f'Test Loss: {loss}')
 print(f'Test MAE: {mae}')
 
 # Plot training & validation loss values
 plt.figure(figsize=(12, 6))
 plt.plot(history.history['loss'], label='Train Loss')
-plt.plot(history.history['val_loss'], label='Validation Loss')
+# plt.plot(history.history['val_loss'], label='Validation Loss')
 plt.title('Model Loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')

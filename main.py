@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 import Layer 
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 # Loading data
 file_path = "full_data.csv"
@@ -39,18 +40,14 @@ renamed = {
 df = pd.read_csv(file_path)
 df_selected = df.iloc[:, filtered] 
 
-
-
-
-
 # Data preprocessing
 df_selected.columns = renamed.values()
 
-df_selected['Median_Income'] = df_selected['Median_Income'] / 100
-df_selected['Per_Capita_Income'] = df_selected['Per_Capita_Income'] / 100
+# df_selected['Median_Income'] = df_selected['Median_Income'] / 100
+# df_selected['Per_Capita_Income'] = df_selected['Per_Capita_Income'] / 100
 
-df_selected['Num_in_Shelters'] = (df_selected['Num_in_Shelters'] - df_selected['Num_in_Shelters'].mean()) / df_selected['Num_in_Shelters'].std()
-df_selected['Num_on_Street'] = (df_selected['Num_on_Street'] - df_selected['Num_on_Street'].mean()) / df_selected['Num_on_Street'].std()
+# df_selected['Num_in_Shelters'] = (df_selected['Num_in_Shelters'] - df_selected['Num_in_Shelters'].mean()) / df_selected['Num_in_Shelters'].std()
+# df_selected['Num_on_Street'] = (df_selected['Num_on_Street'] - df_selected['Num_on_Street'].mean()) / df_selected['Num_on_Street'].std()
 
 # print(df_selected.head())
 
@@ -84,7 +81,35 @@ df_selected = df_selected.apply(pd.to_numeric, errors='ignore')
 # print(df_selected.iloc[:, 2:21].to_numpy())
 # print(df_selected.iloc[:, 21:22].to_numpy())
 
-NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
+min_max_scaler = MinMaxScaler()
+standard_scaler = StandardScaler()
+
+# using minmax and standard scaler
+min_max_cols = ['Median_Income', 'Per_Capita_Income']
+standard_cols = ['Num_in_Shelters', 'Num_on_Street']
+
+df_selected[min_max_cols] = min_max_scaler.fit_transform(df_selected[min_max_cols])
+df_selected[standard_cols] = standard_scaler.fit_transform(df_selected[standard_cols])
+
+remaining = ['Population', 'Race:Black', 'Race:White', 'Race:Asian', 'Race:Hispanic',
+             'Population_pct:12-21', 'Population_pct:12-29', 'Population_pct:16-24',
+             'Population_pct:65+', 'Pct_Under_Poverty_Line', 'Pct_Under_9th_Grade',
+             'Pct_No_Highschool', 'Pct_Higher_Education', 'Pct_Unemployed',
+             'Pct_Employed']
+
+df_selected[remaining] = min_max_scaler.fit_transform(df_selected[remaining])
+
+# targets = ['Violent_Crime_per_Population', 'Nonviolent_Crime_per_Population']
+targets = ['Violent_Crime_per_Population', 'Nonviolent_Crime_per_Population']
+features = [col for col in df_selected.columns if col not in targets + ['City', 'State']]
+
+X = df_selected[features].to_numpy()
+print(np.shape(X))
+y = df_selected[targets[0]].to_numpy()
+print(np.shape(y))
+
+
+NN = Layer.NeuralNetwork("ReLU", 8, [19, 17, 15, 13, 11, 9, 7, 5, 3, 1], X, y)
 
 # NN = Layer.NeuralNetwork("ReLU", 1, [19, 22, 1], df_selected.iloc[:, 2:21].to_numpy(), df_selected.iloc[:, 21:22].to_numpy())
 
