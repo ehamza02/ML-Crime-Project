@@ -93,8 +93,7 @@ model.compile(optimizer=Adam(learning_rate=0.01), loss=Huber(), metrics=['mae'])
 # Training
 history = model.fit(X_train, y_train, epochs=400, batch_size=32, validation_data=(X_test, y_test))
 
-print(model.predict(X_test))
-
+predictions = model.predict(X_test)
 
 # Predictions and Evaluation
 loss, mae = model.evaluate(X_test, y_test)
@@ -108,5 +107,21 @@ plt.plot(history.history['val_loss'], label='Validation Loss')
 plt.title('Model Loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
+plt.legend()
+plt.show()
+
+# Plot actual vs predicted values
+
+plt.figure(figsize=(12, 6))
+plt.plot(predictions[:, 0], label='Test Predictions')
+plt.plot(y_test.to_numpy()[:, 0], label='Actual Values')
+plt.title('Violent Crime per Population')
+plt.legend()
+plt.show()
+
+plt.figure(figsize=(12, 6))
+plt.plot(predictions[:, 1], label='Test Predictions')
+plt.plot(y_test.to_numpy()[:, 1], label='Actual Values')
+plt.title('Non-Violent Crime per Population')
 plt.legend()
 plt.show()
