@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Predictor</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Crime Predictor</h1>
+    <form id="predictionForm">
+        <label for="population">Population:</label>
+        <input type="number" id="population" name="population" required><br>
+
+        <label for="median_income">Median Income:</label>
+        <input type="number" id="median_income" name="median_income" required><br>
+
+        <!-- Add more input fields for other features -->
+
+        <button type="submit">Predict</button>
+    </form>
+    <div id="result">
+        <h2>Prediction Result:</h2>
+        <p id="output"></p>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
+
