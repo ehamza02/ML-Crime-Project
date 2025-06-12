@@ -241,3 +241,7 @@ for i in range(len(predictions)):
 # plt.title('Predictions vs Actuals')
 # plt.legend()
 # plt.show()
+
+
+#Next steps: 
+#reduce dimensionality, experiment with different model architecture, expirement with hyperparams, 
